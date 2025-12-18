@@ -47,3 +47,17 @@ app.use('/api', apiRoutes);
 app.listen(3000, () => {
     console.log('Sunucu çalışıyor: http://localhost:3000');
 });
+
+// Depo ve Satış verilerini getiren API
+app.get('/api/depo-satis', (req, res) => {
+    const query = `
+        SELECT ds.*, u.urun_adi 
+        FROM depo_satis ds 
+        JOIN urunler u ON ds.urun_id = u.id 
+        ORDER BY ds.yil DESC, ds.urun_id ASC`;
+    
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).send(err);
+        res.json(results);
+    });
+});

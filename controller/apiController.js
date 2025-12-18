@@ -51,3 +51,51 @@ exports.getUretimGecmisi = (req, res) => {
         }
     });
 };
+
+// --- controller/apiController.js EN ALTINA (SON PARANTEZDEN ÖNCE) ---
+
+// 4. İki Serayı Verimlilik (Ciro/m2) Açısından Karşılaştır
+exports.seraKarsilastir = (req, res) => {
+    const { sera1Id, sera2Id } = req.body;
+
+    // Eğer seralar seçilmediyse hata dönmesin, uyarı dönsün
+    if (!sera1Id || !sera2Id) {
+        return res.json({ error: "Lütfen iki sera seçiniz." });
+    }
+
+    // DÜZELTME BURADA YAPILDI: 'buyukluk_m2' yerine 'alan_m2' kullanıldı.
+    const sql = `
+        SELECT 
+            s.id, 
+            s.sera_adi, 
+            s.alan_m2, 
+            IFNULL(SUM(up.kazanc_tl), 0) as toplam_gelir
+        FROM seralar s
+        LEFT JOIN uretim_planlari up ON s.id = up.sera_id
+        WHERE s.id IN (?, ?)
+        GROUP BY s.id
+    `;
+
+    db.query(sql, [sera1Id, sera2Id], (err, results) => {
+        if (err) {
+            // Hatanın detayını terminalde (Windsurf alt panelde) görmek için:
+            console.log("Karşılaştırma SQL Hatası:", err); 
+            res.status(500).json({ error: "Veritabanı hatası" });
+            return;
+        }
+
+        // Sonuçları işle
+        const analizSonucu = results.map(sera => {
+            // 0'a bölme hatası olmasın diye kontrol
+            const alan = sera.alan_m2 > 0 ? sera.alan_m2 : 1; 
+            const verimlilik = sera.toplam_gelir / alan; 
+
+            return {
+                sera_adi: sera.sera_adi,
+                verimlilik: verimlilik.toFixed(2)
+            };
+        });
+
+        res.json(analizSonucu);
+    });
+};
