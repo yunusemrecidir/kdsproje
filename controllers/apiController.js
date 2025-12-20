@@ -1,6 +1,5 @@
 const db = require('../model/database');
 
-// 1. Ürün Listesini Getir
 exports.getUrunler = (req, res) => {
     db.query('SELECT * FROM urunler', (err, result) => {
         if (err) {
@@ -12,7 +11,6 @@ exports.getUrunler = (req, res) => {
     });
 };
 
-// 2. Sera Listesini Getir
 exports.getSeralar = (req, res) => {
     db.query('SELECT * FROM seralar', (err, result) => {
         if (err) {
@@ -24,7 +22,6 @@ exports.getSeralar = (req, res) => {
     });
 };
 
-// 3. Üretim Geçmişini Getir
 exports.getUretimGecmisi = (req, res) => {
     const sql = `
         SELECT 
@@ -51,7 +48,6 @@ exports.getUretimGecmisi = (req, res) => {
     });
 };
 
-// 4. İki Serayı Verimlilik Açısından Karşılaştır
 exports.seraKarsilastir = (req, res) => {
     const { sera1Id, sera2Id } = req.body;
 
@@ -92,7 +88,6 @@ exports.seraKarsilastir = (req, res) => {
     });
 };
 
-// 5. Depo ve Satış Verilerini Getir
 exports.getDepoSatis = (req, res) => {
     const query = `
         SELECT ds.*, u.urun_adi 
@@ -106,7 +101,6 @@ exports.getDepoSatis = (req, res) => {
     });
 };
 
-// 6. Arz-Talep Uçurumu Grafiği için Veri Getir (Yıl Filtreli)
 exports.getArzTalep = (req, res) => {
     const yil = req.query.yil;
     
@@ -114,7 +108,6 @@ exports.getArzTalep = (req, res) => {
     let params = [];
     
     if (yil && yil !== 'tumu') {
-        // Belirli bir yıl seçilmişse
         query = `
             SELECT 
                 u.urun_adi,
@@ -127,7 +120,6 @@ exports.getArzTalep = (req, res) => {
             ORDER BY u.urun_adi ASC`;
         params = [yil];
     } else {
-        // Tüm yılların toplamı
         query = `
             SELECT 
                 u.urun_adi,
@@ -148,7 +140,6 @@ exports.getArzTalep = (req, res) => {
     });
 };
 
-// 7. Depo Satış Yıllarını Getir
 exports.getDepoYillar = (req, res) => {
     const query = `SELECT DISTINCT yil FROM depo_satis ORDER BY yil DESC`;
     
@@ -161,7 +152,6 @@ exports.getDepoYillar = (req, res) => {
     });
 };
 
-// 8. En Çok Kazandıran Ürünler (Gelir Dağılımı)
 exports.getEnCokKazandiranUrunler = (req, res) => {
     const query = `
         SELECT 
@@ -181,7 +171,6 @@ exports.getEnCokKazandiranUrunler = (req, res) => {
     });
 };
 
-// 9. Yıllık Finansal Trend (Gelir vs Gider)
 exports.getFinansalTrend = (req, res) => {
     const query = `
         SELECT 
@@ -201,7 +190,6 @@ exports.getFinansalTrend = (req, res) => {
     });
 };
 
-// 10. Sera Verimlilik Ligi (Metrekare Başına Ciro)
 exports.getSeraVerimlilik = (req, res) => {
     const query = `
         SELECT 
@@ -223,7 +211,6 @@ exports.getSeraVerimlilik = (req, res) => {
     });
 };
 
-// 11. Karlılık Analizi (ROI & Kar Marjı)
 exports.getKarlilikAnalizi = (req, res) => {
     const query = `
         SELECT 
@@ -252,7 +239,6 @@ exports.getKarlilikAnalizi = (req, res) => {
     });
 };
 
-// 12. Ürün Detay (Risk Analizi için)
 exports.getUrunDetay = (req, res) => {
     const urunId = req.params.id;
     const query = `
@@ -277,7 +263,6 @@ exports.getUrunDetay = (req, res) => {
     });
 };
 
-// 13. Genel Finans Durumu (Enflasyon Analizi için)
 exports.getGenelFinansDurumu = (req, res) => {
     const query = `
         SELECT 
@@ -294,7 +279,6 @@ exports.getGenelFinansDurumu = (req, res) => {
     });
 };
 
-// 14. Finansal Özet (Merkezi Hesaplama - Single Source of Truth)
 exports.getFinansalOzet = (req, res) => {
     const query = `
         SELECT 

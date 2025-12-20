@@ -1,6 +1,4 @@
-// ==========================================
-// 1. GLOBALS & INIT (TÜM DEĞİŞKENLER)
-// ==========================================
+
 let urunListesi = [];
 let seraListesi = [];
 let uretimVerileri = [];
@@ -12,7 +10,6 @@ let chartSeraKarsilastirma = null;
 
 const yorucuUrunler = ['Domates', 'Muz', 'Biber', 'Patlıcan', 'Karpuz'];
 
-// SAYFA YÜKLENDİĞİNDE ÇALIŞACAKLAR
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
     initProduction();
@@ -20,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initDepo();
 });
 
-// SAYFA GEÇİŞ FONKSİYONU
 function sayfaGoster(sayfaId) {
     document.querySelectorAll('.sayfa').forEach(div => div.style.display = 'none');
     document.getElementById('sayfa-' + sayfaId).style.display = 'block';
@@ -30,10 +26,7 @@ function sayfaGoster(sayfaId) {
     if (activeLink) activeLink.classList.add('active');
 }
 
-// ==========================================
-// 2. ANA PANEL (DASHBOARD) FONKSİYONLARI
-// ==========================================
-// Global finansal özet verisi (Single Source of Truth)
+
 let finansalOzetVerisi = null;
 
 function initDashboard() {
@@ -54,7 +47,6 @@ function initDashboard() {
         })
         .catch(err => console.error("Sera verisi hatası:", err));
 
-    // Merkezi Finansal Özet - Single Source of Truth
     fetchFinansalOzet();
 
     drawCostChart();
@@ -64,15 +56,12 @@ function initDashboard() {
     drawSeraVerimlilikChart();
     drawROIChart();
 }
-
-// Merkezi Finansal Özet Fonksiyonu
 async function fetchFinansalOzet() {
     try {
         const response = await fetch('/api/finansal-ozet');
         const data = await response.json();
         finansalOzetVerisi = data;
         
-        // Dashboard kartlarını güncelle
         const giderElement = document.getElementById('toplam-gider');
         const gelirElement = document.getElementById('toplam-gelir');
         
@@ -83,7 +72,6 @@ async function fetchFinansalOzet() {
             gelirElement.textContent = `₺${parseFloat(data.toplam_gelir).toLocaleString()}`;
         }
         
-        // Geçmiş Üretimler sayfasındaki kartları da güncelle
         const uretimGiderElement = document.getElementById('toplam-gider');
         const uretimGelirElement = document.getElementById('toplam-gelir');
         
@@ -128,9 +116,6 @@ function drawDashboardChart(data) {
     });
 }
 
-// ==========================================
-// 3. ÜRETİM PLANLAMA FONKSİYONLARI
-// ==========================================
 function initProduction() {
     fetch('/api/uretim-gecmisi')
         .then(res => res.json())
@@ -224,14 +209,11 @@ function drawProductionChart(data) {
     });
 }
 
-// ==========================================
-// 4. KARAR ANALİZLERİ
-// ==========================================
 function initAnaliz() {
     if (urunListesi.length > 0 && seraListesi.length > 0) {
         analizDropdownDoldur();
     }
-    // Merkezi Finansal Özet verisini çek (Single Source of Truth)
+
     if (!finansalOzetVerisi) {
         fetchFinansalOzet();
     }
@@ -245,37 +227,30 @@ function analizDropdownDoldur() {
     const seraHTML = seraListesi.map(s => `<option value="${s.id}">${s.sera_adi} (${s.alan_m2} m²)</option>`).join('');
     const urunHTML = urunListesi.filter(u => u.id != 99).map(u => `<option value="${u.id}">${u.urun_adi}</option>`).join('');
 
-    // Nadas Kutuları
     if (document.getElementById('nadas-sera-secimi')) document.getElementById('nadas-sera-secimi').innerHTML = seraHTML;
     if (document.getElementById('nadas-urun-secimi')) document.getElementById('nadas-urun-secimi').innerHTML = urunHTML;
     
-    // Risk Analizi Ürün Seçimi
     const riskSelect = document.getElementById('risk-urun-secimi');
     if (riskSelect) {
         riskSelect.innerHTML = '<option value="">Ürün Seçiniz...</option>' + urunHTML;
     }
     
-    // Yatırım Kutusu
     if (document.getElementById('yatirim-urun')) document.getElementById('yatirim-urun').innerHTML = urunHTML;
 
-    // Karşılaştırma Kutuları
     if (document.getElementById('comp-sera-a')) {
         document.getElementById('comp-sera-a').innerHTML = seraHTML;
         document.getElementById('comp-urun-a').innerHTML = urunHTML;
         document.getElementById('comp-sera-b').innerHTML = seraHTML;
         document.getElementById('comp-urun-b').innerHTML = urunHTML;
 
-        // Düello Kutuları
         if (document.getElementById('duello-urun-1')) {
             document.getElementById('duello-urun-1').innerHTML = urunHTML;
             document.getElementById('duello-urun-2').innerHTML = urunHTML;
 
-            // Maliyet Düello Kutuları
             if (document.getElementById('maliyet-urun-1')) {
                 document.getElementById('maliyet-urun-1').innerHTML = urunHTML;
                 document.getElementById('maliyet-urun-2').innerHTML = urunHTML;
 
-                // Sera Düello Kutuları
                 if (document.getElementById('sera-duello-1')) {
                     const seraOpts = seraListesi.map(s => `<option value="${s.id}">${s.sera_adi}</option>`).join('');
                     document.getElementById('sera-duello-1').innerHTML = seraOpts;
@@ -286,7 +261,6 @@ function analizDropdownDoldur() {
     }
 }
 
-// --- MODÜL 1: NADAS ANALİZİ ---
 function analizNadas() {
     const sonucDiv = document.getElementById('nadas-sonuc');
     const seraId = document.getElementById('nadas-sera-secimi').value;
@@ -349,7 +323,6 @@ function analizNadas() {
     `;
 }
 
-// --- MODÜL 2: YATIRIM ANALİZİ ---
 function analizYatirim() {
     const tip = document.getElementById('yatirim-tipi').value;
     const urunId = document.getElementById('yatirim-urun').value;
@@ -379,7 +352,6 @@ function analizYatirim() {
     `;
 }
 
-// --- MODÜL 3: SENARYO KARŞILAŞTIRMA ---
 function analizKarsilastir() {
     const sA = seraListesi.find(s => s.id == document.getElementById('comp-sera-a').value);
     const uA = urunListesi.find(u => u.id == document.getElementById('comp-urun-a').value);
@@ -431,7 +403,6 @@ function analizKarsilastir() {
     `;
 }
 
-// --- MODÜL 4: STRES TESTİ ---
 function analizStres() {
     const artisGubre = parseInt(document.getElementById('slider-gubre').value);
     const artisIscilik = parseInt(document.getElementById('slider-iscilik').value);
@@ -443,7 +414,6 @@ function analizStres() {
     document.getElementById('val-enerji').innerText = artisEnerji;
     document.getElementById('val-lojistik').innerText = artisLojistik;
 
-    // Merkezi Finansal Özet verisini kullan (Single Source of Truth)
     if (!finansalOzetVerisi) {
         console.warn("Finansal özet verisi henüz yüklenmedi");
         return;
@@ -454,11 +424,10 @@ function analizStres() {
 
     const normalKar = toplamCiro - toplamMaliyet;
     
-    // Sektörel Ağırlık Katsayıları (Tarımsal Gerçeklik)
-    const payGubre = toplamMaliyet * 0.35;      // Gübre & İlaç: %35
-    const payIscilik = toplamMaliyet * 0.40;    // İşçilik: %40 (En yüksek etki)
-    const payEnerji = toplamMaliyet * 0.15;     // Enerji: %15
-    const payLojistik = toplamMaliyet * 0.10;   // Lojistik: %10
+    const payGubre = toplamMaliyet * 0.35;      
+    const payIscilik = toplamMaliyet * 0.40;    
+    const payEnerji = toplamMaliyet * 0.15;     
+    const payLojistik = toplamMaliyet * 0.10;   
 
     const yeniGubre = payGubre * (1 + artisGubre / 100);
     const yeniIscilik = payIscilik * (1 + artisIscilik / 100);
@@ -480,9 +449,6 @@ function analizStres() {
     }
 }
 
-// ==========================================
-// GRAFİK FONKSİYONLARI
-// ==========================================
 function drawCostChart() {
     const canvas = document.getElementById('maliyetPastasi');
     if (!canvas) return;
@@ -511,7 +477,6 @@ function drawCostChart() {
     });
 }
 
-// En Çok Kazandıran Ürünler - Doughnut Chart
 async function drawKazancChart() {
     const canvas = document.getElementById('kazancPastasi');
     if (!canvas) return;
@@ -526,7 +491,6 @@ async function drawKazancChart() {
         const etiketler = veriler.map(v => v.urun_adi);
         const degerler = veriler.map(v => parseFloat(v.toplam_kazanc) || 0);
         
-        // Çeşitli ve ayırt edilebilir renk paleti
         const renkler = [
             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
             '#FF9F40', '#E7E9ED', '#76D7C4', '#F39C12', '#8E44AD',
@@ -575,7 +539,6 @@ async function drawKazancChart() {
             }
         });
 
-        // En Yüksek Kazançlı Ürünler Listesi
         const listeDiv = document.getElementById('kazancListesi');
         if (listeDiv) {
             const toplamKazanc = degerler.reduce((a, b) => a + b, 0);
@@ -607,7 +570,6 @@ async function drawKazancChart() {
     }
 }
 
-// Yıllık Finansal Trend (Gelir vs Gider) - Area Chart
 async function drawFinansalTrendChart() {
     const canvas = document.getElementById('gelirGiderGrafigi');
     if (!canvas) return;
@@ -715,7 +677,6 @@ async function drawFinansalTrendChart() {
     }
 }
 
-// Sera Verimlilik Ligi - Yatay Bar Chart
 async function drawSeraVerimlilikChart() {
     const canvas = document.getElementById('verimlilikGrafigi');
     if (!canvas) return;
@@ -730,12 +691,11 @@ async function drawSeraVerimlilikChart() {
         const seraAdlari = veriler.map(v => v.sera_adi);
         const skorlar = veriler.map(v => parseFloat(v.verimlilik_skoru) || 0);
         
-        // Madalya renkleri: Altın, Gümüş, Bronz + standart yeşil tonları
         const renkler = veriler.map((v, index) => {
-            if (index === 0) return '#FFD700'; // Altın
-            if (index === 1) return '#C0C0C0'; // Gümüş
-            if (index === 2) return '#CD7F32'; // Bronz
-            return '#4caf50'; // Standart yeşil
+            if (index === 0) return '#FFD700'; 
+            if (index === 1) return '#C0C0C0'; 
+            if (index === 2) return '#CD7F32';
+            return '#4caf50';
         });
 
         new Chart(ctx, {
@@ -816,7 +776,6 @@ async function drawSeraVerimlilikChart() {
     }
 }
 
-// Yatırım Verimliliği & Kar Marjı Analizi - ROI Chart
 async function drawROIChart() {
     const canvas = document.getElementById('roiGrafigi');
     if (!canvas) return;
@@ -829,16 +788,14 @@ async function drawROIChart() {
 
         const ctx = canvas.getContext('2d');
         
-        // Etiketler: "Ürün Adı - Sera Adı (Yıl)"
         const etiketler = veriler.map(v => `${v.urun_adi} - ${v.sera_adi} (${v.yil})`);
         const karMarjlari = veriler.map(v => parseFloat(v.kar_marji) || 0);
         
-        // Akıllı renklendirme mantığı
         const renkler = karMarjlari.map(marj => {
-            if (marj > 100) return '#2e7d32';      // Koyu Yeşil - Yüksek Verim
-            if (marj >= 50) return '#66bb6a';      // Açık Yeşil - İyi Verim
-            if (marj >= 0) return '#ffa726';       // Turuncu - Düşük Verim
-            return '#ef5350';                       // Kırmızı - Zarar/Risk
+            if (marj > 100) return '#2e7d32';      
+            if (marj >= 50) return '#66bb6a';     
+            if (marj >= 0) return '#ffa726';       
+            return '#ef5350';                      
         });
 
         new Chart(ctx, {
@@ -920,9 +877,6 @@ async function drawROIChart() {
     }
 }
 
-// ==========================================
-// FİYAT KIRILMA NOKTASI (RİSK ANALİZİ)
-// ==========================================
 let riskUrunVerisi = null;
 
 function initRiskAnalizi() {
@@ -945,10 +899,8 @@ function initRiskAnalizi() {
                 const data = await response.json();
                 riskUrunVerisi = data;
                 
-                // Mevcut fiyatı göster (Sol sütun)
                 document.getElementById('risk-fiyat').textContent = `₺${parseFloat(data.satis_fiyati_tl).toFixed(2)}`;
                 
-                // Slider min/max ayarla
                 const mevcutFiyat = parseFloat(data.satis_fiyati_tl);
                 const maliyet = parseFloat(data.maliyet_tl_m2);
                 const verim = parseFloat(data.verim_kg_m2);
@@ -965,7 +917,6 @@ function initRiskAnalizi() {
                 document.getElementById('slider-min').textContent = `₺${minFiyat.toFixed(2)}`;
                 document.getElementById('slider-max').textContent = `₺${maxFiyat.toFixed(2)}`;
                 
-                // Break-even fiyatını göster
                 document.getElementById('risk-breakeven').textContent = `₺${breakEvenFiyat.toFixed(2)} /kg`;
                 
                 bilgiAlani.style.display = 'block';
@@ -993,36 +944,29 @@ function hesaplaRiskSimulasyonu(senaryoFiyati) {
     const verim = parseFloat(riskUrunVerisi.verim_kg_m2);
     const mevcutFiyat = parseFloat(riskUrunVerisi.satis_fiyati_tl);
     
-    // Break-even fiyatı (kar = 0 noktası)
     const breakEvenFiyat = maliyet / verim;
     
-    // Güvenli sınır: Break-even + %20
     const guvenliSinir = breakEvenFiyat * 1.2;
     
-    // Göstergeleri güncelle (Orta sütun)
     document.getElementById('senaryo-fiyat-gosterge').textContent = `₺${senaryoFiyati.toFixed(2)}`;
     
-    // Durum rozeti elementleri (Sağ sütun)
     const durumKutusu = document.getElementById('risk-durum-kutusu');
     const durumBadge = document.getElementById('risk-durum-badge');
     const durumIcon = document.getElementById('risk-durum-icon');
     
-    if (senaryoFiyati >= guvenliSinir) {
-        // YEŞİL - Güvenli Bölge (Fiyat > Break-even + %20)
+    if (senaryoFiyati >= guvenliSinir) {  
         durumKutusu.style.background = 'linear-gradient(135deg, #e8f5e9, #c8e6c9)';
         durumKutusu.style.borderColor = '#4caf50';
         durumBadge.textContent = 'KÂRLI';
         durumBadge.style.color = '#2e7d32';
         durumIcon.textContent = '✅';
     } else if (senaryoFiyati >= breakEvenFiyat) {
-        // SARI - Dikkat Bölgesi (Fiyat > Break-even ama sınırda)
         durumKutusu.style.background = 'linear-gradient(135deg, #fff8e1, #ffecb3)';
         durumKutusu.style.borderColor = '#ffc107';
         durumBadge.textContent = 'RİSKLİ';
         durumBadge.style.color = '#f57c00';
         durumIcon.textContent = '⚠️';
     } else {
-        // KIRMIZI - Zarar Bölgesi (Fiyat < Break-even)
         durumKutusu.style.background = 'linear-gradient(135deg, #ffebee, #ffcdd2)';
         durumKutusu.style.borderColor = '#f44336';
         durumBadge.textContent = 'ZARAR';
@@ -1031,9 +975,6 @@ function hesaplaRiskSimulasyonu(senaryoFiyati) {
     }
 }
 
-// ==========================================
-// ENFLASYON & REEL GETİRİ TESTİ
-// ==========================================
 let enflasyonFinansVerisi = null;
 
 async function initEnflasyonAnalizi() {
@@ -1041,7 +982,6 @@ async function initEnflasyonAnalizi() {
     if (!enflasyonSlider) return;
     
     try {
-        // Merkezi Finansal Özet API'sini kullan (Single Source of Truth)
         const response = await fetch('/api/finansal-ozet');
         const data = await response.json();
         enflasyonFinansVerisi = {
@@ -1072,16 +1012,12 @@ function hesaplaEnflasyonSimulasyonu(enflasyonOrani) {
     const toplamGelir = parseFloat(enflasyonFinansVerisi.toplam_gelir) || 0;
     const mevcutKar = toplamGelir - toplamMaliyet;
     
-    // Enflasyon Çarpanı = 1 + (SliderDeğeri / 100)
     const enflasyonCarpani = 1 + (enflasyonOrani / 100);
     
-    // Yeni Toplam Maliyet = Maliyet * Enflasyon Çarpanı
     const yeniMaliyet = toplamMaliyet * enflasyonCarpani;
     
-    // Senaryo Net Kar = Gelir - Yeni Maliyet
     const senaryoKar = toplamGelir - yeniMaliyet;
     
-    // Göstergeleri güncelle
     document.getElementById('enflasyon-oran').textContent = `%${enflasyonOrani}`;
     document.getElementById('enflasyon-senaryo-kar').textContent = `₺${senaryoKar.toLocaleString()}`;
     
@@ -1090,7 +1026,6 @@ function hesaplaEnflasyonSimulasyonu(enflasyonOrani) {
     const uyariElement = document.getElementById('enflasyon-uyari');
     
     if (enflasyonOrani < 0) {
-        // Deflasyon - YEŞİL
         senaryoKarElement.style.color = '#2e7d32';
         senaryoKutu.style.background = '#e8f5e9';
         senaryoKutu.style.borderColor = '#4caf50';
@@ -1098,7 +1033,6 @@ function hesaplaEnflasyonSimulasyonu(enflasyonOrani) {
         uyariElement.style.color = '#2e7d32';
         uyariElement.innerHTML = `<i class="fas fa-smile"></i> Deflasyon Senaryosu: Maliyetler düşerse kârınız ₺${(senaryoKar - mevcutKar).toLocaleString()} artar!`;
     } else if (senaryoKar < 0) {
-        // Zarar - KIRMIZI
         senaryoKarElement.style.color = '#c62828';
         senaryoKutu.style.background = '#ffebee';
         senaryoKutu.style.borderColor = '#f44336';
@@ -1106,7 +1040,6 @@ function hesaplaEnflasyonSimulasyonu(enflasyonOrani) {
         uyariElement.style.color = '#c62828';
         uyariElement.innerHTML = `<i class="fas fa-exclamation-triangle"></i> KRİTİK! Mevcut gelir yapısı bu enflasyonu kaldıramaz! Zarar: ₺${Math.abs(senaryoKar).toLocaleString()}`;
     } else if (senaryoKar < mevcutKar) {
-        // Kar azalıyor - TURUNCU
         const karErimesi = mevcutKar - senaryoKar;
         const erimeyuzdesi = ((karErimesi / mevcutKar) * 100).toFixed(1);
         senaryoKarElement.style.color = '#e65100';
@@ -1116,7 +1049,6 @@ function hesaplaEnflasyonSimulasyonu(enflasyonOrani) {
         uyariElement.style.color = '#e65100';
         uyariElement.innerHTML = `<i class="fas fa-arrow-down"></i> Dikkat! Kârınız %${erimeyuzdesi} eriyerek ₺${karErimesi.toLocaleString()} azalıyor.`;
     } else {
-        // Normal durum
         senaryoKarElement.style.color = '#2e7d32';
         senaryoKutu.style.background = '#e8f5e9';
         senaryoKutu.style.borderColor = '#4caf50';
@@ -1162,9 +1094,6 @@ function drawTrendChart() {
     });
 }
 
-// ==========================================
-// DÜELLO FONKSİYONLARI
-// ==========================================
 function analizGecmisKarsilastir() {
     const urun1Id = document.getElementById('duello-urun-1').value;
     const urun2Id = document.getElementById('duello-urun-2').value;
@@ -1356,12 +1285,8 @@ function analizSeraKarsilastir() {
     });
 }
 
-// ==========================================
-// 5. DEPO & SATIŞ SAYFASI FONKSİYONLARI
-// ==========================================
 async function initDepo() {
     try {
-        // Yıl dropdown'ını doldur ve Arz-Talep Grafiğini Çiz
         await initArzTalepYillar();
         drawArzTalepChart();
         
@@ -1468,10 +1393,8 @@ function drawDepoChart(veriler) {
     });
 }
 
-// Arz-Talep Uçurumu Grafiği
 let chartArzTalep = null;
 
-// Yıl dropdown'ını doldur
 async function initArzTalepYillar() {
     const select = document.getElementById('yilFiltresiDepo');
     if (!select) return;
@@ -1480,10 +1403,8 @@ async function initArzTalepYillar() {
         const response = await fetch('/api/depo-yillar');
         const yillar = await response.json();
         
-        // Mevcut seçenekleri temizle (Tümü hariç)
         select.innerHTML = '<option value="tumu">Tüm Yıllar (Genel Toplam)</option>';
         
-        // Yılları ekle
         yillar.forEach(item => {
             const option = document.createElement('option');
             option.value = item.yil;
@@ -1495,7 +1416,6 @@ async function initArzTalepYillar() {
     }
 }
 
-// Yıl değiştiğinde grafiği güncelle
 function yilDegistiArzTalep() {
     const select = document.getElementById('yilFiltresiDepo');
     const secilenYil = select ? select.value : 'tumu';
@@ -1507,7 +1427,6 @@ async function drawArzTalepChart(yil = 'tumu') {
     if (!canvas) return;
 
     try {
-        // Yıl parametresi ile API'ye istek at
         const url = yil && yil !== 'tumu' 
             ? `/api/depo-arz-talep?yil=${yil}` 
             : '/api/depo-arz-talep?yil=tumu';
@@ -1528,7 +1447,6 @@ async function drawArzTalepChart(yil = 'tumu') {
 
         if (chartArzTalep) chartArzTalep.destroy();
 
-        // Grafik başlığını yıla göre ayarla
         const baslik = yil && yil !== 'tumu' 
             ? `${yil} Yılı Arz-Talep Karşılaştırması` 
             : 'Tüm Yıllar Genel Toplam';

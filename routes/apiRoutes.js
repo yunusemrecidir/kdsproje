@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/apiController'); 
 
-// API Rotaları
 router.get('/urunler', apiController.getUrunler);
 router.get('/seralar', apiController.getSeralar);
 router.get('/uretim-gecmisi', apiController.getUretimGecmisi);
