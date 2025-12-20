@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli - Asya Sera KDS</title>
+    <link rel="stylesheet" href="/panel.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-seedling"></i> ASYA SERA</h2>
+            <span>Karar Destek Sistemi</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" onclick="sayfaGoster('dashboard')" class="menu-link active" id="link-dashboard">
+                <i class="fas fa-home"></i>
+                <span>Ana Panel</span>
+            </a>
+            <a href="#" onclick="sayfaGoster('uretim')" class="menu-link" id="link-uretim">
+                <i class="fas fa-seedling"></i>
+                <span>Geçmiş Üretimler</span>
+            </a>
+            <a href="#" onclick="sayfaGoster('analiz')" class="menu-link" id="link-analiz">
+                <i class="fas fa-chart-pie"></i>
+                <span>Karar Analizleri</span>
+            </a>
+            <a href="#" onclick="sayfaGoster('depo')" class="menu-link" id="link-depo">
+                <i class="fas fa-warehouse"></i>
+                <span>Depo</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <a href="/" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Çıkış Yap</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- ==================== DASHBOARD ==================== -->
+        <div id="sayfa-dashboard" class="sayfa" style="display: block;">
+            <div class="page-header">
+                <h1><i class="fas fa-tachometer-alt"></i> Ana Panel</h1>
+                <p>2026 Stratejik Karar Destek Ekranı</p>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-chart-bar"></i> Tüm Ürünlerin Karlılık Analizi (m² Bazlı)</h3>
+                <div class="chart-container large">
+                    <canvas id="karGrafigi"></canvas>
+                </div>
+            </div>
+             
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-pie"></i> Operasyonel Gider Dağılımı</h3>
+                    <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Toplam maliyetin kalemlere göre oransal dağılımı.</p>
+                    <div class="chart-container">
+                        <canvas id="maliyetPastasi"></canvas>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-chart-line"></i> Yıllık Büyüme Trendi</h3>
+                    <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Son yılların ciro karşılaştırması.</p>
+                    <div class="chart-container">
+                        <canvas id="trendGrafigi"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 24px;">
+                <div class="info-card">
+                    <h3><i class="fas fa-coins" style="color:#00897b;"></i> Gelir Dağılımı (En Çok Kazandıranlar)</h3>
+                    <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Ürün bazında toplam kazanç oranları.</p>
+                    <div class="chart-container">
+                        <canvas id="kazancPastasi"></canvas>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-trophy" style="color:#ffc107;"></i> En Yüksek Kazançlı Ürünler</h3>
+                    <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Toplam gelire göre sıralama.</p>
+                    <div id="kazancListesi" style="padding: 10px 0;"></div>
+                </div>
+            </div>
+
+            <!-- Yıllık Finansal Trend Grafiği -->
+            <div class="info-card" style="margin-top: 24px;">
+                <h3><i class="fas fa-chart-area" style="color:#3498db;"></i> Yıllık Finansal Trend (Gelir vs Gider)</h3>
+                <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Yıllara göre toplam gelir ve gider karşılaştırması.</p>
+                <div class="chart-container large">
+                    <canvas id="gelirGiderGrafigi"></canvas>
+                </div>
+            </div>
+
+            <!-- Sera Verimlilik Ligi -->
+            <div class="info-card" style="margin-top: 24px;">
+                <h3><i class="fas fa-trophy" style="color:#FFD700;"></i> Sera Verimlilik Ligi</h3>
+                <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Metrekare başına düşen ciro (TL/m²) sıralaması - En verimli seralar.</p>
+                <div class="chart-container large">
+                    <canvas id="verimlilikGrafigi"></canvas>
+                </div>
+            </div>
+
+            <!-- Yatırım Verimliliği & Kar Marjı Analizi -->
+            <div class="info-card" style="margin-top: 24px;">
+                <h3><i class="fas fa-percentage" style="color:#2e7d32;"></i> Yatırım Verimliliği & Net Kar Marjı Analizi (%)</h3>
+                <p style="font-size:12px; color:#666; margin-top:-10px; margin-bottom:15px;">Her üretim kaydının ROI değeri - Hangi yatırım paranızı en hızlı katlar?</p>
+                <div class="chart-container large">
+                    <canvas id="roiGrafigi"></canvas>
+                </div>
+            </div>
+
+            <!-- Ürün Performans Karşılaştırması -->
+            <div class="analysis-card purple" style="margin-top: 24px;">
+                <h3><i class="fas fa-history"></i> Ürün Performans Karşılaştırması (2022-2025)</h3>
+                <p>İki farklı ürünün geçmiş yıllardaki net kar performansını grafik üzerinde kıyaslayın.</p>
+                
+                <div class="comparison-wrapper" style="background:#f3e5f5;">
+                    <div class="comparison-group">
+                        <label style="color:#673ab7; font-weight:600;">1. Ürün (Mor Çizgi):</label>
+                        <select id="duello-urun-1"></select>
+                    </div>
+                    <div class="comparison-divider"><i class="fas fa-times"></i></div>
+                    <div class="comparison-group">
+                        <label style="color:#2196f3; font-weight:600;">2. Ürün (Mavi Çizgi):</label>
+                        <select id="duello-urun-2"></select>
+                    </div>
+                    <button onclick="analizGecmisKarsilastir()" class="btn-primary purple" style="width:auto; padding:12px 24px;">
+                        KIYASLA <i class="fas fa-chart-line"></i>
+                    </button>
+                </div>
+                <div class="chart-container large">
+                    <canvas id="duelloGrafigi"></canvas>
+                </div>
+            </div>
+
+            <!-- Maliyet Düellosu -->
+            <div class="analysis-card orange" style="margin-top: 24px;">
+                <h3><i class="fas fa-wallet"></i> Detaylı Maliyet Düellosu (Gider Analizi)</h3>
+                <p>İki ürünün üretim maliyetlerini (Gübre, İşçilik, Enerji) kalem kalem kıyaslayın.</p>
+                
+                <div class="comparison-wrapper" style="background:#fff3e0;">
+                    <div class="comparison-group">
+                        <label style="color:#e65100; font-weight:600;">1. Ürün:</label>
+                        <select id="maliyet-urun-1"></select>
+                    </div>
+                    <div class="comparison-divider"><i class="fas fa-balance-scale"></i></div>
+                    <div class="comparison-group">
+                        <label style="color:#e65100; font-weight:600;">2. Ürün:</label>
+                        <select id="maliyet-urun-2"></select>
+                    </div>
+                    <button onclick="analizMaliyetKiyasla()" class="btn-primary orange" style="width:auto; padding:12px 24px;">
+                        GİDERLERİ KIYASLA <i class="fas fa-search-dollar"></i>
+                    </button>
+                </div>
+                <div class="chart-container large">
+                    <canvas id="maliyetGrafigi"></canvas>
+                </div>
+            </div>
+
+            <!-- Sera Verimlilik Kapışması -->
+            <div class="analysis-card teal" style="margin-top: 24px;">
+                <h3><i class="fas fa-torii-gate"></i> Sera Verimlilik Kapışması (Ciro/m²)</h3>
+                <p>İki seranın metrekare başına ürettiği yıllık ciro potansiyelini kıyaslayın.</p>
+                
+                <div class="comparison-wrapper" style="background:#e0f2f1;">
+                    <div class="comparison-group">
+                        <label style="color:#00695c; font-weight:600;">1. Sera:</label>
+                        <select id="sera-duello-1"></select>
+                    </div>
+                    <div class="comparison-divider"><i class="fas fa-bolt"></i></div>
+                    <div class="comparison-group">
+                        <label style="color:#00695c; font-weight:600;">2. Sera:</label>
+                        <select id="sera-duello-2"></select>
+                    </div>
+                    <button onclick="analizSeraKarsilastir()" class="btn-primary teal" style="width:auto; padding:12px 24px;">
+                        KAPIŞTIR <i class="fas fa-fist-raised"></i>
+                    </button>
+                </div>
+                <div class="chart-container large">
+                    <canvas id="seraKarsilastirmaGrafigi"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ÜRETİM PLANLAMA ==================== -->
+        <div id="sayfa-uretim" class="sayfa" style="display: none;">
+            <div class="page-header">
+                <h1><i class="fas fa-seedling"></i> Geçmiş Üretimler & Raporlar</h1>
+                <p>Geçmiş dönem analizleri ve bütçe dağılımı.</p>
+            </div>
+
+            <div class="filter-bar">
+                <span><i class="fas fa-filter"></i> Dönem Seçiniz:</span>
+                <div class="filter-buttons">
+                    <button onclick="yilFiltrele('tumu')" class="btn-filter active" id="btn-tumu">Tümü</button>
+                    <button onclick="yilFiltrele(2022)" class="btn-filter" id="btn-2022">2022</button>
+                    <button onclick="yilFiltrele(2023)" class="btn-filter" id="btn-2023">2023</button>
+                    <button onclick="yilFiltrele(2024)" class="btn-filter" id="btn-2024">2024</button>
+                    <button onclick="yilFiltrele(2025)" class="btn-filter" id="btn-2025">2025</button>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card blue-card">
+                    <div class="stat-info">
+                        <h4>Toplam Üretim Gideri</h4>
+                        <p id="toplam-gider">₺0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                </div>
+                
+                <div class="stat-card green-card">
+                    <div class="stat-info">
+                        <h4>Toplam Tahmini Gelir</h4>
+                        <p id="toplam-gelir">₺0</p>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-chart-column"></i> Sera Bütçe Dağılımı (Gider vs Gelir)</h3>
+                <div class="chart-container">
+                    <canvas id="butceGrafigi"></canvas>
+                </div>
+            </div>
+
+            <div class="info-card" style="margin-top: 24px;">
+                <h3><i class="fas fa-clipboard-list"></i> Detaylı Üretim Raporu</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sera</th>
+                            <th>Ürün</th>
+                            <th>Yıl</th>
+                            <th>Gider</th>
+                            <th>Gelir</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uretim-rapor-tablo"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================== KARAR ANALİZLERİ ==================== -->
+        <div id="sayfa-analiz" class="sayfa" style="display: none;">
+            <div class="page-header">
+                <h1><i class="fas fa-brain"></i> Stratejik Karar Destek Merkezi</h1>
+                <p>Geleceğe yönelik yatırım, üretim ve risk simülasyonları.</p>
+            </div>
+
+            <div class="grid-2">
+                <!-- Nadas Analizi -->
+                <div class="analysis-card orange">
+                    <h3><i class="fas fa-bed"></i> Nadas vs. Üretim Kararı</h3>
+                    <p>Toprağı dinlendirmenin verime etkisi.</p>
+                    
+                    <div class="form-group">
+                        <label>Analiz Edilecek Sera:</label>
+                        <select id="nadas-sera-secimi"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ürün:</label>
+                        <select id="nadas-urun-secimi"></select>
+                    </div>
+                    
+                    <button onclick="analizNadas()" class="btn-primary orange">
+                        <i class="fas fa-play"></i> SİMÜLASYONU ÇALIŞTIR
+                    </button>
+                    
+                    <div id="nadas-sonuc" class="result-box orange"></div>
+                </div>
+
+                <!-- Yatırım Robotu -->
+                <div class="analysis-card blue">
+                    <h3><i class="fas fa-plus-circle"></i> Yeni Sera Yatırım Robotu</h3>
+                    <p>Yeni yatırım kendini amorti eder mi?</p>
+                    
+                    <div class="form-group">
+                        <label>Sera Tipi:</label>
+                        <select id="yatirim-tipi">
+                            <option value="0">Seçiniz...</option>
+                            <option value="kucuk">Küçük Boy (Tünel) - 200 m² (80k TL)</option>
+                            <option value="orta">Orta Boy (Plastik) - 500 m² (150k TL)</option>
+                            <option value="buyuk">Büyük Boy (Cam) - 1.000 m² (400k TL)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Üretilecek Ürün:</label>
+                        <select id="yatirim-urun"></select>
+                    </div>
+                    
+                    <button onclick="analizYatirim()" class="btn-primary blue">
+                        <i class="fas fa-calculator"></i> YATIRIMI ANALİZ ET
+                    </button>
+                    
+                    <div id="yatirim-sonuc" class="result-box blue"></div>
+                </div>
+            </div>
+
+            <!-- Senaryo Karşılaştırma -->
+            <div class="analysis-card blue" style="margin-top: 24px;">
+                <h3><i class="fas fa-balance-scale"></i> Senaryo Karşılaştırma Analizi</h3>
+                <p>İki farklı sera ve ürün kombinasyonunu yan yana koyup karlılıklarını kıyaslayın.</p>
+                
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:20px;">
+                    <div style="flex:1; background:#e3f2fd; padding:20px; border-radius:12px; min-width:250px;">
+                        <strong style="color:#1565c0; font-size:14px;">SENARYO A</strong>
+                        <div class="form-group" style="margin-top:12px;">
+                            <label>Sera Seçimi:</label>
+                            <select id="comp-sera-a"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ürün Seçimi:</label>
+                            <select id="comp-urun-a"></select>
+                        </div>
+                    </div>
+
+                    <div style="flex:1; background:#e3f2fd; padding:20px; border-radius:12px; min-width:250px;">
+                        <strong style="color:#1565c0; font-size:14px;">SENARYO B</strong>
+                        <div class="form-group" style="margin-top:12px;">
+                            <label>Sera Seçimi:</label>
+                            <select id="comp-sera-b"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ürün Seçimi:</label>
+                            <select id="comp-urun-b"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="analizKarsilastir()" class="btn-primary blue" style="margin-top:20px;">
+                    <i class="fas fa-exchange-alt"></i> KIYASLA
+                </button>
+
+                <div id="comp-sonuc" style="display:none; margin-top:20px; padding:20px; background:#f5f5f5; border-radius:12px;"></div>
+            </div>
+
+            <!-- Maliyet Simülasyonu -->
+            <div class="analysis-card red" style="margin-top: 24px;">
+                <h3><i class="fas fa-fire-extinguisher"></i> Gelişmiş Maliyet Simülasyonu</h3>
+                <p>Farklı kalemlerdeki fiyat artışlarının karlılığa etkisi.</p>
+                
+                <div style="padding:20px 0;">
+                    <div class="slider-group">
+                        <label>
+                            <span>Gübre & İlaç Zammı:</span>
+                            <span>%<span id="val-gubre">0</span></span>
+                        </label>
+                        <input type="range" id="slider-gubre" min="0" max="100" value="0" step="5" oninput="analizStres()">
+                    </div>
+                    <div class="slider-group">
+                        <label>
+                            <span>İşçilik Zammı:</span>
+                            <span>%<span id="val-iscilik">0</span></span>
+                        </label>
+                        <input type="range" id="slider-iscilik" min="0" max="100" value="0" step="5" oninput="analizStres()">
+                    </div>
+                    <div class="slider-group">
+                        <label>
+                            <span>Enerji Zammı:</span>
+                            <span>%<span id="val-enerji">0</span></span>
+                        </label>
+                        <input type="range" id="slider-enerji" min="0" max="100" value="0" step="5" oninput="analizStres()">
+                    </div>
+                    <div class="slider-group">
+                        <label>
+                            <span>Lojistik Zammı:</span>
+                            <span>%<span id="val-lojistik">0</span></span>
+                        </label>
+                        <input type="range" id="slider-lojistik" min="0" max="100" value="0" step="5" oninput="analizStres()">
+                    </div>
+                </div>
+
+                <div style="background:#ffebee; padding:20px; border-radius:12px; text-align:center; border:1px solid #ffcdd2;">
+                    <span style="font-size:13px; color:#555;">Mevcut Şartlarda Tahmini Kar</span><br>
+                    <strong style="font-size:24px; color:#333;" id="normal-kar">₺0</strong>
+                    <hr style="border:0; border-top:1px solid #ffcdd2; margin:15px 0;">
+                    <span style="font-size:13px; color:#d32f2f; font-weight:bold;">Simülasyon Sonucu Kar</span><br>
+                    <strong style="font-size:32px; color:#d32f2f;" id="stresli-kar">₺0</strong>
+                    <div id="kar-degisim" style="font-size:12px; color:#d32f2f; margin-top:5px;"></div>
+                </div>
+            </div>
+
+            <!-- Fiyat Kırılma Noktası (Break-Even) Analizörü - Modern 3 Sütunlu Tasarım -->
+            <div class="analysis-card green" style="margin-top: 24px;">
+                <h3><i class="fas fa-chart-line"></i> 📉 Fiyat Kırılma Noktası Analizi</h3>
+                <p>Ürün fiyatı düşerse ne olur? Anlık durum tespiti.</p>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label><strong>Analiz Edilecek Ürün:</strong></label>
+                    <select id="risk-urun-secimi" class="form-select" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:14px;">
+                        <option value="">Ürün Seçiniz...</option>
+                    </select>
+                </div>
+
+                <div id="risk-bilgi-alani" style="display:none; margin-top:25px;">
+                    <!-- 3 Sütunlu Modern Kart Yapısı -->
+                    <div style="display:grid; grid-template-columns: 1fr 1.5fr 1fr; gap:20px; align-items:stretch;">
+                        
+                        <!-- Sol: Mevcut Durum -->
+                        <div style="background:linear-gradient(135deg, #e3f2fd, #bbdefb); padding:25px 15px; border-radius:16px; text-align:center; border:2px solid #1976d2;">
+                            <span style="font-size:11px; color:#1565c0; text-transform:uppercase; letter-spacing:1px;">Mevcut Fiyat</span>
+                            <div style="font-size:36px; font-weight:800; color:#0d47a1; margin:10px 0;" id="risk-fiyat">₺0</div>
+                            <span style="font-size:12px; color:#666;">/ kg</span>
+                        </div>
+
+                        <!-- Orta: Simülasyon Slider -->
+                        <div style="background:#f8f9fa; padding:20px; border-radius:16px; border:1px solid #e0e0e0;">
+                            <div style="text-align:center; margin-bottom:15px;">
+                                <span style="font-size:12px; color:#666; text-transform:uppercase; letter-spacing:1px;">Fiyat Senaryosu</span>
+                                <div style="font-size:32px; font-weight:700; color:#333; margin-top:5px;" id="senaryo-fiyat-gosterge">₺0.00</div>
+                            </div>
+                            <input type="range" id="fiyat-slider" style="width:100%; height:10px; cursor:pointer; accent-color:#2e7d32;" min="0" max="100" value="50">
+                            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:#999;">
+                                <span id="slider-min">Min</span>
+                                <span id="slider-max">Max</span>
+                            </div>
+                        </div>
+
+                        <!-- Sağ: Durum Rozeti -->
+                        <div id="risk-durum-kutusu" style="background:linear-gradient(135deg, #e8f5e9, #c8e6c9); padding:25px 15px; border-radius:16px; text-align:center; border:3px solid #4caf50; display:flex; flex-direction:column; justify-content:center;">
+                            <div id="risk-durum-badge" style="font-size:28px; font-weight:900; color:#2e7d32; text-transform:uppercase; letter-spacing:2px;">KÂRLI</div>
+                            <div id="risk-durum-icon" style="font-size:40px; margin-top:5px;">✅</div>
+                        </div>
+                    </div>
+
+                    <!-- Alt: Kritik Bilgi - Break-Even Fiyatı -->
+                    <div style="margin-top:20px; background:#fff3e0; padding:18px 25px; border-radius:12px; border-left:5px solid #ff9800; display:flex; align-items:center; gap:15px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size:24px; color:#f57c00;"></i>
+                        <div>
+                            <span style="font-size:13px; color:#666;">Bu ürün için zarar etmeye başlayacağınız sınır fiyat:</span>
+                            <strong style="font-size:20px; color:#e65100; margin-left:10px;" id="risk-breakeven">₺0.00 /kg</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enflasyon & Reel Getiri Testi -->
+            <div class="analysis-card purple" style="margin-top: 24px;">
+                <h3><i class="fas fa-chart-area"></i> 📉 Enflasyon & Reel Getiri Testi</h3>
+                <p>Maliyetler artarken geliriniz sabit kalırsa, net kârınız nasıl erir? Anlık simülasyon.</p>
+                
+                <div style="background:#f3e5f5; padding:20px; border-radius:12px; margin-top:20px;">
+                    <label style="font-weight:600; color:#673ab7; display:block; margin-bottom:15px;">
+                        <i class="fas fa-percentage"></i> Maliyet Enflasyonu Oranı:
+                    </label>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <input type="range" id="enflasyon-slider" style="flex:1; height:8px; cursor:pointer;" min="-20" max="100" value="0">
+                        <span id="enflasyon-oran" style="font-size:24px; font-weight:bold; color:#673ab7; min-width:80px; text-align:center;">%0</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#888; margin-top:5px;">
+                        <span>Deflasyon (-%20)</span>
+                        <span>Hiper Enflasyon (+%100)</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:20px; margin-top:20px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px; background:#e8f5e9; padding:20px; border-radius:12px; text-align:center; border:2px solid #4caf50;">
+                        <span style="font-size:12px; color:#666;">Mevcut Net Kâr</span><br>
+                        <strong style="font-size:28px; color:#2e7d32;" id="enflasyon-mevcut-kar">₺0</strong>
+                    </div>
+                    <div style="flex:1; min-width:200px; background:#fff3e0; padding:20px; border-radius:12px; text-align:center; border:2px solid #ff9800;" id="enflasyon-senaryo-kutu">
+                        <span style="font-size:12px; color:#666;">Enflasyon Sonrası Kâr</span><br>
+                        <strong style="font-size:28px;" id="enflasyon-senaryo-kar">₺0</strong>
+                    </div>
+                </div>
+
+                <div id="enflasyon-uyari" style="margin-top:20px; padding:15px; border-radius:10px; text-align:center; font-weight:600; font-size:14px; background:#e8f5e9; color:#2e7d32;">
+                    <i class="fas fa-info-circle"></i> Slider'ı hareket ettirerek enflasyon senaryolarını test edin.
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DEPO ==================== -->
+        <div id="sayfa-depo" class="sayfa" style="display: none;">
+            <div class="page-header">
+                <h1><i class="fas fa-warehouse"></i> Depo Karar Destek Ekranı</h1>
+                <p>Geçmiş verilerin ortalamalarına göre gelecek üretim planlama önerileri.</p>
+            </div>
+
+            <!-- Arz-Talep Uçurumu Grafiği -->
+            <div class="info-card" style="margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <div>
+                        <h3 style="margin-bottom: 0;"><i class="fas fa-balance-scale-left"></i> Arz-Talep Uçurumu Analizi</h3>
+                        <p style="font-size:12px; color:#666; margin-top:5px; margin-bottom:0;">Ürün bazında toplam üretim ve talep karşılaştırması.</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="yilFiltresiDepo" style="font-size: 13px; font-weight: 600; color: #555;">
+                            <i class="fas fa-calendar-alt" style="color: #4caf50; margin-right: 5px;"></i>Yıl:
+                        </label>
+                        <select id="yilFiltresiDepo" onchange="yilDegistiArzTalep()" style="padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 13px; background: #fff; cursor: pointer; min-width: 180px;">
+                            <option value="tumu">Tüm Yıllar (Genel Toplam)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container large">
+                    <canvas id="arzTalepChart"></canvas>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <table id="tablo-strateji" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>Ürün Adı</th>
+                            <th style="text-align:center;">Ortalama Üretim Miktarı</th>
+                            <th style="text-align:center;">Ortalama Ürüne Gelen Talep</th>
+                            <th>Gelecek Üretim İçin Öneri</th>
+                        </tr>
+                    </thead>
+                    <tbody id="strateji-body"></tbody>
+                </table>
+            </div>
+            
+            <div class="info-card" style="margin-top:24px;">
+                <h3><i class="fas fa-chart-line"></i> Yıllara Göre Talep Değişimi</h3>
+                <div class="chart-container">
+                    <canvas id="chartDepoAnaliz"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/panel.js"></script>
+</body>
+</html>

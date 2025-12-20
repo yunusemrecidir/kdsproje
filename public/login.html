@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş - Asya Sera KDS</title>
+    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h1>Asya Sera</h1>
+                <p>Karar Destek Sistemi</p>
+            </div>
+            
+            <form action="/login" method="POST" class="login-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" placeholder="Kullanıcı Adı" required>
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Şifre" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <span>GİRİŞ YAP</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>© 2025 Asya Sera - Tüm Hakları Saklıdır</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
