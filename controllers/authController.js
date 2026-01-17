@@ -1,4 +1,4 @@
-const db = require('../model/database');
+const db = require('../db/mysql_connect');
 
 exports.login = (req, res) => {
     const { username, password } = req.body;

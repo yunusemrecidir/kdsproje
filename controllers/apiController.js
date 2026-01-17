@@ -1,4 +1,4 @@
-const db = require('../model/database');
+const db = require('../db/mysql_connect');
 
 exports.getUrunler = (req, res) => {
     db.query('SELECT * FROM urunler', (err, result) => {
@@ -10,6 +10,7 @@ exports.getUrunler = (req, res) => {
         }
     });
 };
+
 
 exports.getSeralar = (req, res) => {
     db.query('SELECT * FROM seralar', (err, result) => {
